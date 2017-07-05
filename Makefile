@@ -36,5 +36,5 @@ opusfile:
 	$(EMMAKE) make
 
 main: $(FILES)
-	$(EMCC) $(CFLAGS) $(FILES) $(LIBS) -o dist/wildcat.js --llvm-lto 1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s NO_FILESYSTEM=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_wc_open', '_wc_close', '_wc_seek', '_wc_tell', '_wc_buffer', '_wc_channels', '_wc_read']" && \
-	mv dist/wildcat.js.mem dist/wildcat.mem.js
+	$(EMCC) $(CFLAGS) $(FILES) $(LIBS) -o dist/wildcat-core.js --llvm-lto 1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s NO_FILESYSTEM=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_wc_open', '_wc_close', '_wc_seek', '_wc_tell', '_wc_buffer', '_wc_channels', '_wc_read']" && \
+	mv dist/wildcat-core.js.mem dist/wildcat-core.mem.js
