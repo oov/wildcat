@@ -35,6 +35,6 @@ opusfile:
 	$(EMCONF) ./configure --disable-http --disable-examples --disable-doc && \
 	$(EMMAKE) make
 
-main: $(FILES)
+decoder: $(FILES)
 	$(EMCC) $(CFLAGS) $(FILES) $(LIBS) -o dist/decoder-core.js --llvm-lto 1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s NO_FILESYSTEM=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_wc_open', '_wc_close', '_wc_seek', '_wc_tell', '_wc_buffer', '_wc_channels', '_wc_read']" && \
 	mv dist/decoder-core.js.mem dist/decoder-core.mem.js

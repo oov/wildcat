@@ -51,7 +51,7 @@ void EMSCRIPTEN_KEEPALIVE wc_close() {
 }
 
 // ~-1 = error / 0~ = pcm total length
-int EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate) {
+int EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate, int buffer_size_msec) {
   if (ctx != NULL) {
     return -1;
   }
@@ -73,8 +73,7 @@ int EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate) {
     return -2;
   }
 
-  const int BUFFER_SIZE_MSEC = 120;
-  opus_buffer_size = sizeof(float)*((48000*BUFFER_SIZE_MSEC)/1000)*channels;
+  opus_buffer_size = sizeof(float)*((48000*buffer_size_msec)/1000)*channels;
   opus_buffer = (float*)malloc(opus_buffer_size);
   if (opus_buffer == NULL) {
     wc_close();
@@ -90,7 +89,7 @@ int EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate) {
     }
     spx_resampler_skip_zeros(resampler);
 
-    dest_buffer_size = sizeof(float)*((target_samplerate*(BUFFER_SIZE_MSEC+1))/1000)*channels;
+    dest_buffer_size = sizeof(float)*((target_samplerate*(buffer_size_msec+1))/1000)*channels;
     dest_buffer = (float*)malloc(dest_buffer_size);
     if (dest_buffer == NULL) {
       wc_close();
