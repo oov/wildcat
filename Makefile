@@ -12,8 +12,9 @@ SPEEXDSP_INCLUDE=$(CURDIR)/speexdsp/include/speex
 SPEEXDSP_SRC=$(CURDIR)/speexdsp/libspeexdsp
 
 FILES = $(SPEEXDSP_SRC)/resample.c src/decoder/main.c
-CFLAGS = -O3 -I$(OGG_INCLUDE) -I$(OPUS_INCLUDE) -I$(OPUSFILE_INCLUDE) -I$(SPEEXDSP_INCLUDE) -DOUTSIDE_SPEEX -DRANDOM_PREFIX=spx -DFLOATING_POINT -DEXPORT=
+CFLAGS = -I$(OGG_INCLUDE) -I$(OPUS_INCLUDE) -I$(OPUSFILE_INCLUDE) -I$(SPEEXDSP_INCLUDE) -DOUTSIDE_SPEEX -DRANDOM_PREFIX=spx -DFLOATING_POINT -DEXPORT=
 LIBS = $(OGG_LIBS)/libogg.so $(OPUS_LIBS)/libopus.so $(OPUSFILE_LIBS)/libopusfile.so
+EMOPT = --memory-init-file 1 -s NO_FILESYSTEM=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_wc_open', '_wc_close', '_wc_seek', '_wc_tell', '_wc_buffer', '_wc_channels', '_wc_read', '_wc_tags']"
 
 ogg:
 	cd ogg && \
@@ -35,6 +36,10 @@ opusfile:
 	$(EMCONF) ./configure --disable-http --disable-examples --disable-doc && \
 	$(EMMAKE) make
 
-decoder: $(FILES)
-	$(EMCC) $(CFLAGS) $(FILES) $(LIBS) -o dist/decoder-core.js --llvm-lto 1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1 -s NO_FILESYSTEM=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_wc_open', '_wc_close', '_wc_seek', '_wc_tell', '_wc_buffer', '_wc_channels', '_wc_read']" && \
+decoder-debug: $(FILES)
+	$(EMCC) $(CFLAGS) $(FILES) $(LIBS) -o dist/decoder-core.js $(EMOPT) && \
+	mv dist/decoder-core.js.mem dist/decoder-core.mem.js
+
+decoder-release: $(FILES)
+	$(EMCC) -O3 $(CFLAGS) $(FILES) $(LIBS) -o dist/decoder-core.js --llvm-lto 1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1  $(EMOPT) && \
 	mv dist/decoder-core.js.mem dist/decoder-core.mem.js

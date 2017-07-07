@@ -50,6 +50,13 @@ void EMSCRIPTEN_KEEPALIVE wc_close() {
   }
 }
 
+const OpusTags* EMSCRIPTEN_KEEPALIVE wc_tags() {
+  if (ctx == NULL) {
+    return NULL;
+  }
+  return op_tags(ctx, -1);
+}
+
 // ~-1 = error / 0~ = pcm total length
 int EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate, int buffer_size_msec) {
   if (ctx != NULL) {
@@ -67,6 +74,7 @@ int EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate, int bu
   ctx = newctx;
   opus_fileimage = p;
   current_position = 0;
+  wc_tags();
 
   channels = op_channel_count(ctx, -1);
   if (channels == 0) {
