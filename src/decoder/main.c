@@ -58,7 +58,7 @@ const OpusTags* EMSCRIPTEN_KEEPALIVE wc_tags() {
 }
 
 // ~-1 = error / 0~ = pcm total length
-int EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate, int buffer_size_msec) {
+double EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate, int buffer_size_msec) {
   if (ctx != NULL) {
     return -1;
   }
@@ -113,28 +113,28 @@ int EMSCRIPTEN_KEEPALIVE wc_open(void *p, int len, int target_samplerate, int bu
     wc_close();
     return -6;
   }
-  return (int)r;
+  return (double)(r) / 48000.0;
 }
 
 // ~-1 = error / 0 = ok
-int EMSCRIPTEN_KEEPALIVE wc_seek(int sample) {
+int EMSCRIPTEN_KEEPALIVE wc_seek(double pos) {
   if (ctx == NULL) {
     return -1;
   }
-  ogg_int64_t pos = (ogg_int64_t)sample;
-  int r = op_pcm_seek(ctx, pos);
+  ogg_int64_t p = (ogg_int64_t)(pos * 48000.0);
+  int r = op_pcm_seek(ctx, p);
   if (r == 0) {
-    current_position = pos;
+    current_position = p;
   }
   return r;
 }
 
-// ~-1 = error / 0~ = sample pos
-int EMSCRIPTEN_KEEPALIVE wc_tell() {
+// ~-1 = error / 0~ = position
+double EMSCRIPTEN_KEEPALIVE wc_tell() {
   if (ctx == NULL) {
     return -1;
   }
-  return op_pcm_tell(ctx);
+  return (double)(op_pcm_tell(ctx)) / 48000.0;
 }
 
 float *EMSCRIPTEN_KEEPALIVE wc_buffer() {
@@ -152,10 +152,11 @@ int EMSCRIPTEN_KEEPALIVE wc_channels() {
   return channels;
 }
 
-int EMSCRIPTEN_KEEPALIVE wc_read(int end_sample_pos) {
+int EMSCRIPTEN_KEEPALIVE wc_read(double end_pos) {
   if (ctx == NULL) {
     return -1;
   }
+  ogg_int64_t end_sample_pos = (ogg_int64_t)(end_pos * 48000.0);
   if (current_position >= end_sample_pos) {
     return 0;
   }
