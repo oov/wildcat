@@ -176,7 +176,7 @@ int EMSCRIPTEN_KEEPALIVE wc_read(int end_sample_pos) {
       return written;
     }
     spx_uint32_t in_len = (spx_uint32_t)written, out_len = (spx_uint32_t)dest_buffer_size / channels;
-    int r = speex_resampler_process_interleaved_float(resampler, opus_buffer, &in_len, dest_buffer, &out_len);
+    int r = spx_resampler_process_interleaved_float(resampler, opus_buffer, &in_len, dest_buffer, &out_len);
     if (r != RESAMPLER_ERR_SUCCESS) {
       return r;
     }
