@@ -37,9 +37,7 @@ opusfile:
 	$(EMMAKE) make
 
 decoder-debug: $(FILES)
-	$(EMCC) $(CFLAGS) $(FILES) $(LIBS) -o dist/decoder-core.js $(EMOPT) && \
-	mv dist/decoder-core.js.mem dist/decoder-core.mem.js
+	$(EMCC) $(CFLAGS) $(FILES) $(LIBS) -o src/decoder/decoder-core.js $(EMOPT)
 
 decoder-release: $(FILES)
-	$(EMCC) -O3 $(CFLAGS) $(FILES) $(LIBS) -o dist/decoder-core.js --llvm-lto 1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1  $(EMOPT) && \
-	mv dist/decoder-core.js.mem dist/decoder-core.mem.js
+	$(EMCC) -O3 $(CFLAGS) $(FILES) $(LIBS) -o src/decoder/decoder-core.js --llvm-lto 1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1  $(EMOPT)
