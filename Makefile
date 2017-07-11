@@ -40,4 +40,4 @@ decoder-debug: $(FILES)
 	$(EMCC) $(CFLAGS) $(FILES) $(LIBS) -o src/decoder/decoder-core.js $(EMOPT)
 
 decoder-release: $(FILES)
-	$(EMCC) -O3 $(CFLAGS) $(FILES) $(LIBS) -o src/decoder/decoder-core.js --llvm-lto 1 -s AGGRESSIVE_VARIABLE_ELIMINATION=1  $(EMOPT)
+	$(EMCC) -Oz $(CFLAGS) $(FILES) $(LIBS) -o src/decoder/decoder-core.js --llvm-lto 3 -s AGGRESSIVE_VARIABLE_ELIMINATION=1  $(EMOPT)
