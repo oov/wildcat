@@ -1,0 +1,28 @@
+{
+  "name": "wildcat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/wildcat.js",
+  "dependencies": {
+    "d3": "^4.9.1",
+    "mermaid": "^7.0.3",
+    "toml": "^2.3.2"
+  },
+  "devDependencies": {
+    "raw-loader": "^0.5.1",
+    "superstatic": "^4.1.0",
+    "ts-loader": "^2.2.2",
+    "typescript": "^2.4.1",
+    "url-loader": "^0.5.9",
+    "webpack": "^3.0.0"
+  },
+  "scripts": {
+    "start": "superstatic --port 10080 --debug true",
+    "build": "webpack --optimize-minimize",
+    "watch": "webpack --progress --colors --watch"
+  },
+  "repository": {},
+  "author": "oov",
+  "license": "MIT",
+  "homepage": "https://github.com/oov/wildcat/"
+}
