@@ -248,7 +248,7 @@ export default class Wildcat {
                 continue;
             }
             sc.next();
-            this.eventQueue.push([sc.currentNode.length, sc.latestUsedLink!]);
+            this.eventQueue.push([sc.prevNode.length, sc.latestUsedLink!]);
             this.fireQueued(sc.latestUsedLink!);
             await decoder.seek(sc.currentNode.start);
         }
