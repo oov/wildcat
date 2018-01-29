@@ -48,12 +48,8 @@ export default class Wildcat {
     private readonly gainNode_ = this.audioCtx.createGain();
     get node(): GainNode { return this.gainNode_; }
 
-    private startAt: number;
     private eventAt: number;
     private pausedOffset: number = 0;
-    get currentTime(): number {
-        return this.audioCtx.currentTime - this.startAt;
-    }
     private eventQueue: [number, scheduler.Link][] = [];
     private eventDispatcher = new event.Dispatcher();
 
@@ -165,7 +161,6 @@ export default class Wildcat {
         this.scriptNode_ = this.audioCtx.createScriptProcessor(this.bufferSize, 0, this.decoder_.channels);
         this.scriptNode_.connect(this.gainNode_);
         this.scriptNode_.onaudioprocess = e => {
-            this.startAt = e.playbackTime;
             this.eventAt = e.playbackTime - offset;
             (e.target as ScriptProcessorNode).onaudioprocess = e => this.processAudio(e);
             this.processAudio(e);
