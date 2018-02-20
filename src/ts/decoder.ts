@@ -228,97 +228,18 @@ export default class Decoder {
             return Decoder.workerURL;
         }
         const sourceCode = `
-// XXX - workaround for iOS9
-// 'use strict';
-
-if (!this.atob) { // XXX - workaround for iOS9
-
-// based on http://www.onicos.com/staff/iz/amuse/javascript/expert/base64.txt
-// Copyright (C) 1999 Masanao Izumo <iz@onicos.co.jp>
-atob = (function() {
 'use strict';
-
-var base64DecodeChars = [
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
-  52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
-  -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-  15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
-  -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-  41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1];
-
-function base64decode(str) {
-    var c1, c2, c3, c4;
-    var i, len, out;
-
-    len = str.length;
-    i = 0;
-    out = "";
-    while(i < len) {
-        /* c1 */
-        do {
-            c1 = base64DecodeChars[str.charCodeAt(i++) & 0xff];
-        } while(i < len && c1 == -1);
-        if(c1 == -1)
-            break;
-
-        /* c2 */
-        do {
-            c2 = base64DecodeChars[str.charCodeAt(i++) & 0xff];
-        } while(i < len && c2 == -1);
-        if(c2 == -1)
-            break;
-
-        out += String.fromCharCode((c1 << 2) | ((c2 & 0x30) >> 4));
-
-        /* c3 */
-        do {
-            c3 = str.charCodeAt(i++) & 0xff;
-            if(c3 == 61)
-                return out;
-            c3 = base64DecodeChars[c3];
-        } while(i < len && c3 == -1);
-        if(c3 == -1)
-            break;
-
-        out += String.fromCharCode(((c2 & 0XF) << 4) | ((c3 & 0x3C) >> 2));
-
-        /* c4 */
-        do {
-            c4 = str.charCodeAt(i++) & 0xff;
-            if(c4 == 61)
-                return out;
-            c4 = base64DecodeChars[c4];
-        } while(i < len && c4 == -1);
-        if(c4 == -1)
-            break;
-        out += String.fromCharCode(((c3 & 0x03) << 6) | c4);
-    }
-    return out;
-}
-return base64decode;
-})();
-}
-
 var Module = {
     preRun: function () { postMessage(['init']); },
-    // XXX - workaround for iOS9
-    // locateFile: function(){ return "${require('url-loader!../decoder/decoder-core.js.mem')}" },
-    memoryInitializerRequest: {
-        response: (function(dataScheme){
-            var b = atob(dataScheme.substring(dataScheme.indexOf(';base64,')+8));
-            var buf = new Uint8Array(b.length)
-            for (var i = 0; i < b.length; ++i) {
-                buf[i] = b.charCodeAt(i);
-            }
-            return buf.buffer;
-        })("${require('url-loader!../decoder/decoder-core.js.mem')}"),
-        status: 200
-    }
 };
+var xhr = new XMLHttpRequest();
+xhr.open('GET', ${JSON.stringify(location.protocol + '//' + location.host + location.pathname.replace(/\/[^/]+$/, '/decoder-core.wasm'))}, false);
+xhr.responseType = 'arraybuffer';
+xhr.send(null);
+if (xhr.status === 200) {
+  Module.wasmBinary = xhr.response;
+}
 ${require('raw-loader!../decoder/decoder-core.js')};
-
 var _open = Module.cwrap('wc_open', 'number', ['number', 'number', 'number', 'number']);
 var _close = Module.cwrap('wc_close', null, []);
 var _channels = Module.cwrap('wc_channels', 'number', []);
@@ -382,7 +303,7 @@ onmessage = function (e) {
     case 'open':
         {
             var file = data[1], rate = data[2], bufferSizeMsec = data[3];
-            var ptr = Module._malloc(file.byteLength);
+            var ptr = Module.getMemory(file.byteLength);
             var src = new Uint8Array(file);
             var dest = new Uint8Array(Module.HEAPU8.buffer, ptr, file.byteLength);
             for (var i = 0; i < file.byteLength; ++i) {
