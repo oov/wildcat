@@ -14,7 +14,7 @@ SPEEXDSP_SRC=$(CURDIR)/speexdsp/libspeexdsp
 FILES = $(SPEEXDSP_SRC)/resample.c src/decoder/main.c
 CFLAGS = -I$(OGG_INCLUDE) -I$(OPUS_INCLUDE) -I$(OPUSFILE_INCLUDE) -I$(SPEEXDSP_INCLUDE) -DOUTSIDE_SPEEX -DRANDOM_PREFIX=spx -DFLOATING_POINT -DEXPORT=
 LIBS = $(OGG_LIBS)/libogg.so $(OPUS_LIBS)/libopus.so $(OPUSFILE_LIBS)/libopusfile.so
-EMOPT = --memory-init-file 1 -s NO_FILESYSTEM=1 -s NO_EXIT_RUNTIME=1 -s EXPORTED_FUNCTIONS="['_wc_open', '_wc_close', '_wc_seek', '_wc_tell', '_wc_buffer', '_wc_channels', '_wc_read', '_wc_tags']"
+EMOPT = -s WASM=1 -s NO_FILESYSTEM=1 -s NO_EXIT_RUNTIME=1 -s 'BINARYEN_METHOD="native-wasm"' -s 'EXTRA_EXPORTED_RUNTIME_METHODS=["cwrap", "getMemory", "UTF8ToString"]' -s EXPORTED_FUNCTIONS="['_wc_open', '_wc_close', '_wc_seek', '_wc_tell', '_wc_buffer', '_wc_channels', '_wc_read', '_wc_tags']"
 
 ogg:
 	cd ogg && \
